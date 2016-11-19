@@ -11,6 +11,8 @@
 
 import argparse
 import os
+import codecs
+import markdown as md
 from shutil import copyfile
 from utils import create_dir
 
@@ -26,10 +28,10 @@ print args.action
 
 if args.action == 'bootstrap':
     # TODO check if site is already bootstrapped
-    # TODO bootstrap static,template,content,pages files
     folders = ['static','templates','content','content/entries','content/pages','output']
     for folder in folders:
         create_dir(folder)
+        
         src_folder = os.path.dirname(os.path.abspath(__file__)) + '/' + folder
         src_files = os.listdir(src_folder)
         for file_name in src_files:
@@ -42,6 +44,24 @@ if args.action == 'bootstrap':
 
 elif args.action == 'generate':
     # TODO implement generator
+    folders = ['content/','content/entries/','content/pages/']
+    for folder in folders:
+        src_files = os.listdir(folder)
+        for file_name in src_files:
+            if file_name[-3:] == '.md':
+                input_file = codecs.open(folder + file_name, mode="r", encoding="utf-8")
+                text = input_file.read()
+                html = md.markdown(text)
+
+                subfolder = "output/" + folder.split('/')[1]
+                create_dir(subfolder)
+                out_full_name = subfolder + '/' + file_name[:-3] + ".html"  # good god this is horrid
+                output_file = codecs.open(out_full_name, "w", 
+                          encoding="utf-8", 
+                          errors="xmlcharrefreplace"
+                )
+                output_file.write(html)
+                
     print('hi')
 
 else:
