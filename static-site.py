@@ -13,10 +13,11 @@ import argparse
 import os
 import codecs
 import markdown as md
+from jinja2 import Environment, FileSystemLoader
 from shutil import copyfile
 from utils import create_dir
 
-
+env = Environment(loader=FileSystemLoader('templates'))
 
 
 parser = argparse.ArgumentParser()
@@ -43,7 +44,8 @@ if args.action == 'bootstrap':
     
 
 elif args.action == 'generate':
-    # TODO implement generator
+    # TODO implement metadata
+    # TODO implement other templates
     folders = ['content/','content/entries/','content/pages/']
     for folder in folders:
         src_files = os.listdir(folder)
@@ -53,6 +55,9 @@ elif args.action == 'generate':
                 text = input_file.read()
                 html = md.markdown(text)
 
+                template = env.get_template('entry.html')
+                new_file = template.render(content=html)
+
                 subfolder = "output/" + folder.split('/')[1]
                 create_dir(subfolder)
                 out_full_name = subfolder + '/' + file_name[:-3] + ".html"  # good god this is horrid
@@ -60,7 +65,7 @@ elif args.action == 'generate':
                           encoding="utf-8", 
                           errors="xmlcharrefreplace"
                 )
-                output_file.write(html)
+                output_file.write(new_file)
                 
     print('hi')
 
