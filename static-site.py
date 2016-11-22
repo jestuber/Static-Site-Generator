@@ -12,12 +12,15 @@
 import argparse
 import os
 import codecs
-import markdown as md
+import markdown
 from jinja2 import Environment, FileSystemLoader
 from shutil import copyfile
 from utils import create_dir
 
+#Jinja2
 env = Environment(loader=FileSystemLoader('templates'))
+#Markdown
+md = markdown.Markdown(extensions = ['markdown.extensions.meta'])
 
 
 parser = argparse.ArgumentParser()
@@ -53,10 +56,10 @@ elif args.action == 'generate':
             if file_name[-3:] == '.md':
                 input_file = codecs.open(folder + file_name, mode="r", encoding="utf-8")
                 text = input_file.read()
-                html = md.markdown(text)
+                html = md.convert(text)
 
                 template = env.get_template('entry.html')
-                new_file = template.render(content=html)
+                new_file = template.render(content=html, meta=md.Meta)
 
                 subfolder = "output/" + folder.split('/')[1]
                 create_dir(subfolder)
