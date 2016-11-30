@@ -47,7 +47,6 @@ if args.action == 'bootstrap':
     
 
 elif args.action == 'generate':
-    # TODO implement metadata
     # TODO implement other templates
     folders = ['content/','content/entries/','content/pages/']
     for folder in folders:
@@ -58,7 +57,11 @@ elif args.action == 'generate':
                 text = input_file.read()
                 html = md.convert(text)
 
-                template = env.get_template('entry.html')
+                if "pages" in folder:
+                    template = env.get_template('page.html')
+                else:
+                    template = env.get_template('entry.html')
+                    
                 new_file = template.render(content=html, meta=md.Meta)
 
                 subfolder = "output/" + folder.split('/')[1]
@@ -70,7 +73,6 @@ elif args.action == 'generate':
                 )
                 output_file.write(new_file)
                 
-    print('hi')
 
 else:
     # TODO fail with  help message
